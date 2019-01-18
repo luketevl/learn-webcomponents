@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>WebComponents | MODAL</title>
+  <script src="components/modal.js"></script>
+  <style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body{
+    margin: 2rem;
+    font-family: sans-serif;
+  }
+    </style>
+</head>
+<body>
+  <lkt-modal>
+    <p>With your confirmation to gree</p>
+  </lkt-modal>
+  <p>Please confirm your choise</p>
+  <button>Confirm</button>
+  <script>
+    const confirmButton =  document.querySelector('button');
+    const modal = document.querySelector('lkt-modal');
+
+    confirmButton.addEventListener('click', () => {
+      modal.setAttribute('opened', '');
+    })
+  </script>
+</body>
+</html>

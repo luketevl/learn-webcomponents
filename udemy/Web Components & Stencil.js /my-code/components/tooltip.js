@@ -1,7 +1,8 @@
 class Tooltip extends HTMLElement{
   constructor(){
     super();
-    this._tooltipContainer;
+    
+    this._tooltipVisible = false;
     this._tooltipText = 'Some dummy tooltip text';
     this.attachShadow({
       mode: 'open'
@@ -49,21 +50,36 @@ class Tooltip extends HTMLElement{
     tooltipIcon.addEventListener('mouseleave', this._hideTooltip.bind(this));
     this.shadowRoot.appendChild(tooltipIcon);
     this.style.position= 'relative';
+
+    this._render();
   }
 
   _showTooltip(){
-    console.log('show');
-    this._tooltipContainer = document.createElement('div');
-    this._tooltipContainer.style.backgroundColor = '#000';
-    this._tooltipContainer.style.color = '#FFF';
-    this._tooltipContainer.style.position = 'absolute';
-    this._tooltipContainer.style.zIndex = '2';
-    this._tooltipContainer.textContent = this._tooltipText;
-    this.shadowRoot.appendChild(this._tooltipContainer);
+    this._tooltipVisible = true;
+    this._render();
+    
   }
     _hideTooltip(){
-      this.shadowRoot.removeChild(this._tooltipContainer);
+      this._tooltipVisible = false;
+      this._render();
     }
+
+   _render(){
+    let tooltipContainer = this.shadowRoot.querySelector('div');
+     if(this._tooltipVisible){
+      tooltipContainer = document.createElement('div');
+      tooltipContainer.style.backgroundColor = '#000';
+      tooltipContainer.style.color = '#FFF';
+      tooltipContainer.style.position = 'absolute';
+      tooltipContainer.style.zIndex = '2';
+      tooltipContainer.textContent = this._tooltipText;
+      this.shadowRoot.appendChild(tooltipContainer);
+     }else{
+       if(tooltipContainer){
+         this.shadowRoot.removeChild(tooltipContainer);
+       }
+     }
+   }
 }
 
 customElements.define('lkt-tooltip', Tooltip);

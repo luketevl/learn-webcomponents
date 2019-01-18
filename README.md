@@ -3,6 +3,9 @@ Learn about WebComponents
 
 # LINKS 
 - https://developers.google.com/web/tools/chrome-devtools/inspect-styles/
+- https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots
+- https://developers.google.com/web/fundamentals/web-components/customelements
+- https://developers.google.com/web/fundamentals/web-components/shadowdom
 
 
 # What are Web Components? 
@@ -439,6 +442,10 @@ _example(){
 
 
 ## FUNCTIONS
+- **RENDER***
+```js
+_render(){}
+```
 
 
 
