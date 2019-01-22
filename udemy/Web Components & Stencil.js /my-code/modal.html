@@ -19,6 +19,7 @@
 </head>
 <body>
   <lkt-modal>
+    <h1 slot="title">Confirm?</h1>
     <p>With your confirmation to gree</p>
   </lkt-modal>
   <p>Please confirm your choise</p>
@@ -26,9 +27,18 @@
   <script>
     const confirmButton =  document.querySelector('button');
     const modal = document.querySelector('lkt-modal');
+    
+    
+    modal.addEventListener('confirm', () => {
+      console.log('Confirmed...');
+
+    })
+    modal.addEventListener('cancel', () => {
+      console.log('Canceled...');
+    })
 
     confirmButton.addEventListener('click', () => {
-      modal.setAttribute('opened', '');
+      modal.open();
     })
   </script>
 </body>
