@@ -6,7 +6,12 @@ Learn about WebComponents
 - https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots
 - https://developers.google.com/web/fundamentals/web-components/customelements
 - https://developers.google.com/web/fundamentals/web-components/shadowdom
-
+- https://www.webcomponents.org/polyfills
+- https://developer.mozilla.org/en-US/docs/Web/Web_Components
+- https://developers.google.com/web/fundamentals/web-components/customelements
+- https://developers.google.com/web/fundamentals/web-components/shadowdom
+- https://github.com/Polymer/lit-element
+- https://github.com/skatejs/skatejs
 
 # What are Web Components? 
 
@@ -121,6 +126,30 @@ customElements.define('lkt-confirm-link', ConfirmLink, { extends: 'a' });
     - Use te keyword **is**
 ```html
 <a href="" is="lkt-confirm-link">Link</a>
+```
+### Dispatch Custom Events
+- Event attached in **element**
+```js
+const cancelButton  = this.shadowRoot.querySelector('#cancel');
+cancelButton.addEventListener('click', this._cancel.bind(this))
+_cancel(event){
+  const eventCustom = new Event('customEvent');
+  event.target.dispatchEvent(eventCustom);
+}
+```
+- Event attached in **component**
+  - **bubles** allows us to define whether this event should bubble up or not
+  - **composed** when set to true now suddenly ensures that this will work
+    - you set it to true, then this event may leave the shadow DOM in which it is is in one
+```js
+const cancelButton  = this.shadowRoot.querySelector('#cancel');
+cancelButton.addEventListener('click', this._cancel.bind(this))
+_cancel(event){
+  const eventCustom = new Event('customEvent', {
+    bubble: true
+  });
+  event.target.dispatchEvent(eventCustom);
+}
 ```
 
 ### Listening events
@@ -439,6 +468,13 @@ _example(){
   </template>
   <lkt-tooltip>Here we go</lkt-tooltip>
 ```
+- **Slot Changes**
+```
+const slots = this.shadowRoot.querySelectorAll('slot');
+    slots[1].addEventListener('slotchange', event => {
+      console.dir(slots[1].assignedNodes());
+    });
+```
 
 
 ## FUNCTIONS
@@ -446,6 +482,544 @@ _example(){
 ```js
 _render(){}
 ```
+- **Create Public methods**
+```js
+
+```
+
+# Stencil.js
+- https://stenciljs.com/
+- https://stenciljs.com/docs/router
+- https://stenciljs.com/docs/state-tunnel
+- https://stenciljs.com/docs/config
+- https://stenciljs.com/docs/distribution
+- https://stenciljs.com/docs/overview
+
+
+## What is Stencil.JS ?
+![What is Stencil.JS ?](https://i.imgur.com/JwLubdq.png)
+## Modules
+
+- **Create component**
+  - **tag**: TagName
+  - **styleUrl**: URL to configure
+  - **scoped**: Allow us to tell stencil that all the styles it finds in the external stylesheet or that are defined for this component || EMULATE SHADOW DOM
+  - **shadow**: Use native shadow DOM
+```js
+import { Component } from "@stencil/core";
+
+@Component({
+  tag: 'lkt-modal',
+  styleUrl: './lkt-modal.css',
+  scoped: true, 
+  shadow: true,
+
+})
+export class Modal{
+  render(){
+    return (
+      <div>Muahahahahahaha</div> 
+    )
+  }
+}
+```
+
+- **PROPS** | DEFAULT ARE **IMMUTABLE**
+  - **Automatic Watcher**
+```js
+
+import { Component, Prop } from "@stencil/core";
+
+@Component({
+  tag: 'lkt-modal',
+  styleUrl: './lkt-modal.css',
+  scoped: true, 
+  shadow: true,
+
+})
+export class Modal{
+  @Prop({
+    reflectToAttr: true
+  }) title: string;
+
+  @Prop({
+    reflectToAttr: true,
+    mutable: true
+  }) open: string;
+
+  render(){
+    return (
+      <h1>{this.title}</h1>
+    )
+  }
+}
+```
+
+- *STATE**
+```js
+
+import { Component, Prop, State } from "@stencil/core";
+
+@Component({
+  tag: 'lkt-modal',
+  styleUrl: './lkt-modal.css',
+  scoped: true, 
+  shadow: true,
+
+})
+export class Modal{
+  @State() showContactInfo: boolean = false;
+
+  @Prop({
+    reflectToAttr: true
+  }) title: string;
+
+  @Prop({
+    reflectToAttr: true,
+    mutable: true
+  }) open: string;
+
+  render(){
+    return (
+      <h1>{this.title}</h1>
+    )
+  }
+}
+```
+- **METHODS**
+```js
+
+import { Component, Prop, State, Method } from "@stencil/core";
+
+@Component({
+  tag: 'lkt-modal',
+  styleUrl: './lkt-modal.css',
+  scoped: true, 
+  shadow: true,
+
+})
+export class Modal{
+  @State() showContactInfo: boolean = false;
+
+  @Prop({
+    reflectToAttr: true
+  }) title: string;
+
+  @Prop({
+    reflectToAttr: true,
+    mutable: true
+  }) opened: string;
+
+@Method() 
+  open(){
+    console.log('method');
+  }
+  render(){
+    return (
+      <h1>{this.title}</h1>
+    )
+  }
+}
+```
+
+## Acessing HOST ELEMENT
+```js
+
+import { Component, Prop, State, Method, Element } from "@stencil/core";
+
+@Component({
+  tag: 'lkt-modal',
+  styleUrl: './lkt-modal.css',
+  scoped: true, 
+  shadow: true,
+
+})
+export class Modal{
+  @Element() el: HTMLElement;
+
+  @State() showContactInfo: boolean = false;
+
+  @Prop({
+    reflectToAttr: true
+  }) title: string;
+
+  @Prop({
+    reflectToAttr: true,
+    mutable: true
+  }) opened: string;
+
+@Method() 
+  open(){
+    const stockSymbol = (this.el.shadowRoot.querySelector('#stock-symbol') as HTMLInputElement).value
+    console.log('method');
+  }
+  render(){
+    return (
+      <h1>{this.title}</h1>
+    )
+  }
+}
+```
+
+
+## Using **REF**
+```js
+
+import { Component, Prop, State, Method, Element } from "@stencil/core";
+
+@Component({
+  tag: 'lkt-modal',
+  styleUrl: './lkt-modal.css',
+  scoped: true, 
+  shadow: true,
+
+})
+export class Modal{
+  stockSymbol: HTMLInputElement;
+  
+  @Element() el: HTMLElement;
+
+  @State() showContactInfo: boolean = false;
+
+  @Prop({
+    reflectToAttr: true
+  }) title: string;
+
+  @Prop({
+    reflectToAttr: true,
+    mutable: true
+  }) opened: string;
+
+@Method() 
+  open(){
+    const stockSymbol = this.stockSymbol.value;
+    console.log('method', stockSymbol);
+  }
+  render(){
+    return (
+      <h1>{this.title}</h1>
+    )
+  }
+}
+```
+## Two Way Binding
+```js
+import { Component, State, Element } from '@stencil/core'
+import { AV_API_KEY } from '../../global/global'
+@Component({
+  tag: 'lkt-stock-price',
+  styleUrl: './lkt-stock-price.css',
+  shadow: true
+})
+
+export class StockPrice{
+  stockInput: HTMLInputElement;
+
+  @Element() el: HTMLElement;
+
+  @State() price: number = 0;
+  @State() stockUserInput: string= '';
+  @State() stockInputValid: boolean;
+
+  onFetchStockPrice(event: Event){
+    event.preventDefault();
+    const stockSymbol = this.stockInput.value;
+    console.log('Submitted');
+
+    fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        if(!data.hasOwnProperty('Error Message')){
+          this.price = +data['Global Quote']['05. price'];
+        }
+      })
+      .catch(err => console.log(err))
+  }
+  onUserInput(event: Event){
+    this.stockUserInput = (event.target as HTMLInputElement).value;
+    this.stockInputValid = this.stockUserInput.trim() !== ''
+
+  }
+   render(){
+     return [
+       <form onSubmit={this.onFetchStockPrice.bind(this)}>
+         <input id="stock-symbol" 
+          ref={el => this.stockInput = el} 
+          value={this.stockUserInput} 
+          onInput={this.onUserInput.bind(this)}
+          />
+         <button disabled={!this.stockInputValid} type="submit">Fetch</button>
+      </form>,
+       <div>
+         <p>Price: {this.price}</p>
+       </div>
+     ]
+   }
+}
+
+```
+## Lifecycle
+- **componentDidLoad**
+```js
+import { Component, State, Element, Prop } from '@stencil/core'
+import { AV_API_KEY } from '../../global/global'
+@Component({
+  tag: 'lkt-stock-price',
+  styleUrl: './lkt-stock-price.css',
+  shadow: true
+})
+
+export class StockPrice{
+  stockInput: HTMLInputElement;
+
+  @Element() el: HTMLElement;
+
+  @State() price: number = 0;
+  @State() stockUserInput: string= '';
+  @State() stockInputValid: boolean;
+  @State() error: string= '';
+  @Prop() stockSymbol: string;
+
+  onFetchStockPrice(event: Event){
+    event.preventDefault();
+    const stockSymbol = this.stockInput.value;
+    console.log('Submitted');
+    this.error = '';
+    this._fetchStockPrice(stockSymbol);
+  }
+  onUserInput(event: Event){
+    this.stockUserInput = (event.target as HTMLInputElement).value;
+    this.stockInputValid = this.stockUserInput.trim() !== ''
+
+  }
+
+  _fetchStockPrice(stockSymbol: string){
+    fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
+    .then(res => {
+      if(res.status !== 200){
+        throw new Error('Invalid')
+       }else{
+          return res.json() ;
+       }
+    })
+    .then(data => {
+      console.log(data);
+      if(!data['Global Quote']['05. price']){
+        throw new Error('Invlaid Symbol');
+      }
+      this.price = +data['Global Quote']['05. price'];
+    })
+    .catch(err => this.error = err.message)
+  }
+  componentDidLoad(){
+    if(this.stockSymbol){
+      this._fetchStockPrice(this.stockSymbol);
+    }
+  }
+   render(){
+    let dataContent = this.error ? <p>Error: {this.error}</p> : <p>Price: {this.price}</p>
+     return [
+       <form onSubmit={this.onFetchStockPrice.bind(this)}>
+         <input id="stock-symbol" 
+          ref={el => this.stockInput = el} 
+          value={this.stockUserInput} 
+          onInput={this.onUserInput.bind(this)}
+          />
+         <button disabled={!this.stockInputValid} type="submit">Fetch</button>
+      </form>,
+       <div>
+         {dataContent}
+       </div>
+     ]
+   }
+}
+
+```
+- **componentWillLoad**
+```js
+componentWillLoad(){
+    console.log('ComponentWillLoad');
+    console.log(this.stockSymbol);
+  }
+```
+- **componentWillUpdate**
+```js
+componentWillUpdate(){
+    console.log('componentWillUpdate');
+    console.log(this.stockSymbol);
+  }
+```
+- **componentDidUpdate**
+```js
+componentDidUpdate(){
+    console.log('componentDidUpdate');
+    console.log(this.stockSymbol);
+  }
+```
+- **componentDidUnload**
+```js
+componentDidUnload(){
+    console.log('componentDidUnload');
+    console.log(this.stockSymbol);
+  }
+```
+## Watch Props Changes
+```JS
+import { Component, State, Element, Prop, Watch } from '@stencil/core'
+import { AV_API_KEY } from '../../global/global'
+@Component({
+  tag: 'lkt-stock-price',
+  styleUrl: './lkt-stock-price.css',
+  shadow: true
+})
+
+export class StockPrice{
+  stockInput: HTMLInputElement;
+  // initialStockSymbol: string = 'AAPL';
+
+  @Element() el: HTMLElement;
+
+  @State() price: number = 0;
+  @State() stockUserInput: string= '';
+  @State() stockInputValid: boolean;
+  @State() error: string= '';
+  @Prop({
+    mutable: true,
+    reflectToAttr: true
+  }) stockSymbol: string;
+
+  @Watch('stockSymbol')
+  stockSymbolChanged(newValue: string, oldValue: string){
+    if(newValue !== oldValue){
+      this.stockUserInput = newValue;
+      this._fetchStockPrice(newValue);
+    }
+  }
+  onFetchStockPrice(event: Event){
+    event.preventDefault();
+    this.stockSymbol = this.stockInput.value;
+    console.log('Submitted');
+    this.error = '';
+    this._fetchStockPrice(this.stockSymbol);
+  }
+  onUserInput(event: Event){
+    this.stockUserInput = (event.target as HTMLInputElement).value;
+    this.stockInputValid = this.stockUserInput.trim() !== ''
+
+  }
+
+  _fetchStockPrice(stockSymbol: string){
+    fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
+    .then(res => {
+      if(res.status !== 200){
+        throw new Error('Invalid')
+       }else{
+          return res.json() ;
+       }
+    })
+    .then(data => {
+      console.log(data);
+      if(!data['Global Quote']['05. price']){
+        throw new Error('InvaLid Symbol');
+      }
+      this.price = +data['Global Quote']['05. price'];
+    })
+    .catch(err => this.error = err.message)
+  }
+  componentDidLoad(){
+    if(this.stockSymbol){
+      // this.initialStockSymbol =this.stockSymbol;
+      this.stockUserInput = this.stockSymbol;
+      this.stockInputValid = true;
+      this._fetchStockPrice(this.stockSymbol);
+    }
+  }
+  // componentWillLoad(){
+  //   console.log('ComponentWillLoad');
+  //   console.log(this.stockSymbol);
+  // }
+
+  // componentWillUpdate(){
+  //   console.log('componentWillUpdate');
+  //   console.log(this.stockSymbol);
+  // }
+  // componentDidUpdate(){
+  // //  if(this.stockSymbol !== this.initialStockSymbol){
+  //   //  this.initialStockSymbol = this.stockSymbol;
+  //   // this._fetchStockPrice(this.stockSymbol);
+  // //  }
+  //   console.log('componentDidUpdate');
+  //   console.log(this.stockSymbol);
+  // }
+  componentDidUnload(){
+    console.log('componentDidUnload');
+    console.log(this.stockSymbol);
+  }
+   render(){
+    let dataContent = this.error ? <p>Error: {this.error}</p> : <p>Price: {this.price}</p>
+     return [
+       <form onSubmit={this.onFetchStockPrice.bind(this)}>
+         <input id="stock-symbol" 
+          ref={el => this.stockInput = el} 
+          value={this.stockUserInput} 
+          onInput={this.onUserInput.bind(this)}
+          />
+         <button disabled={!this.stockInputValid} type="submit">Fetch</button>
+      </form>,
+       <div>
+         {dataContent}
+       </div>
+     ]
+   }
+}
+
+```
+
+## Emiting **CUSTOM EVENTS**
+- **Creating**
+```js
+import { Component, EventEmitter, Event } from '@stencil/core';
+
+  @Event({
+    bubbles: true,
+    composed: true
+  }) lktSymbolSelected: EventEmitter<string>;
+
+export class StockFinder{
+  onSelectSymbol(symbol: string){
+    this.lktSymbolSelected.emit(symbol);
+  }
+
+}
+```
+- **Listening**
+  - #Listen('eventName') | Listen event inside component
+  - #Listen('body:eventName') | Listen event outside component GLOBAL
+```js
+import { Component, Listen } from '@stencil/core'
+export class StockPrice{
+  @Listen('lktSymbolSelected')
+  onStockSymbolSelected(event: CustomEvent){
+    if(event.detail && event.detail !== this.stockSymbol){
+      this._fetchStockPrice(event.detail);
+    }
+  }
+}
+```
+## HOSTDATA | ADD automatic class in web component host
+```js
+hostData(){
+  return {
+    class: this.error ? 'error' : ''
+  }
+}
+```
+
+## EMBEDDING COMPONENTS INTO COMPONENTS
+- **Components** are **globally** just use.
+
+## Deployment & Publishing
 
 
 
@@ -461,3 +1035,4 @@ _render(){}
 - **Attributes VS Properties**
 ![Attributes VS Properties?]("Attributes VS Properties?" /images/attributes_vs_propterties.png)
 - **Light DOM STYLE **  overwrite **SLOT STYLE**
+- You will need some polyfills there - specifically, you need to "unlock" Custom Elements and the Shadow DOM there: https://www.webcomponents.org/polyfills
